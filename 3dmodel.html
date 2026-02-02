@@ -1,152 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Aqusentinel Village | AR Showcase</title>
-
+    <title>AquaSentinel AR</title>
     <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.4.0/model-viewer.min.js"></script>
-
     <style>
-        :root {
-            --water-blue: #00d4ff;
-            --deep-ocean: #004e92;
+        body { margin: 0; background-color: #050505; font-family: sans-serif; color: white; }
+        model-viewer { width: 100vw; height: 100vh; }
+        
+        /* Custom UI */
+        .ar-button {
+            background: #00d4ff; color: white; border: none; border-radius: 8px;
+            padding: 12px 24px; position: absolute; bottom: 30px; left: 50%;
+            transform: translateX(-50%); font-weight: bold; cursor: pointer;
         }
 
-        body {
-            margin: 0;
-            background: radial-gradient(circle, #1a2a6c, #b21f1f, #fdbb2d);
-            /* Sunset village vibe */
-            background: #0a0f1e;
-            height: 100vh;
-            overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        #loading-ui {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 2;
         }
 
-        model-viewer {
-            width: 100%;
-            height: 100%;
-            --progress-bar-color: var(--water-blue);
-        }
-
-        /* Water-Drop Hotspots */
-        .hotspot {
-            width: 22px;
-            height: 22px;
-            border-radius: 50% 50% 50% 0;
-            /* Teardrop base shape */
-            transform: rotate(-45deg);
-            background: var(--water-blue);
-            border: 2px solid #fff;
-            box-shadow: 0 0 15px var(--water-blue);
-            cursor: pointer;
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        /* Pulsing Water Ring */
-        .hotspot::before {
-            content: "";
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            background: var(--water-blue);
-            border-radius: 50%;
-            z-index: -1;
-            animation: pulse-water 2s infinite;
-        }
-
-        @keyframes pulse-water {
-            0% {
-                transform: scale(1);
-                opacity: 0.8;
-            }
-
-            100% {
-                transform: scale(2.5);
-                opacity: 0;
-            }
-        }
-
-        /* Label inside Hotspot */
-        .annotation {
-            transform: rotate(45deg);
-            /* Counter-rotate text back to level */
-            background: rgba(255, 255, 255, 0.9);
-            color: #004e92;
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: bold;
-            position: absolute;
-            top: -40px;
-            left: -20px;
-            white-space: nowrap;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            pointer-events: none;
-        }
-
-        /* AR Button - Liquid Style */
-        #ar-button {
-            background: linear-gradient(135deg, var(--water-blue), var(--deep-ocean));
-            border-radius: 50px;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            position: absolute;
-            bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            padding: 15px 35px;
-            color: white;
-            font-weight: bold;
-            letter-spacing: 1px;
-            cursor: pointer;
-            box-shadow: 0 10px 20px rgba(0, 212, 255, 0.3);
-        }
-
-        .ui-header {
-            position: absolute;
-            top: 20px;
-            width: 100%;
-            text-align: center;
-            color: white;
-            pointer-events: none;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+        .Hotspot { background: #00d4ff; border-radius: 50%; width: 14px; height: 14px; border: 2px solid white; }
+        .HotspotAnnotation { 
+            background: rgba(0,0,0,0.8); color: white; padding: 5px 10px; 
+            border-radius: 4px; font-size: 12px; position: absolute; left: 20px; width: max-content;
         }
     </style>
 </head>
-
 <body>
 
-    <div class="ui-header">
-        <h2 style="margin:0; font-size: 1.2rem;">Aqusentinel Network</h2>
-        <div style="font-size: 0.7rem; color: var(--water-blue);">Live 3D Village Sync</div>
+    <div id="loading-ui">
+        <h2>🛰️ AQUASENTINEL</h2>
+        <p id="progress">Preparing 100MB Model...</p>
     </div>
 
-    <model-viewer src="https://4hc4q5rz2b.ucarecd.net/7c85e0c5-a674-41e9-a3ab-65ee123bfdb1/ProjectName1.glb"
-        crossorigin="anonymous" ar ar-modes="webxr scene-viewer quick-look" camera-controls shadow-intensity="1.5"
-        environment-image="neutral" auto-rotate rotation-speed="0.5" exposure="1" camera-orbit="45deg 75deg 10m"
-        min-camera-orbit="auto auto auto" max-camera-orbit="auto auto 20m">
+    <model-viewer 
+        id="viewer"
+        src="https://4hc4q5rz2b.ucarecd.net/7c85e0c5-a674-41e9-a3ab-65ee123bfdb1/ProjectName1.glb" 
+        ar ar-modes="webxr scene-viewer quick-look" 
+        camera-controls shadow-intensity="2" exposure="1"
+        loading="eager" reveal="manual">
 
-        <button slot="ar-button" id="ar-button">
-            💧 ENTER AQUA-VERSE (AR)
+        <button class="Hotspot" slot="hotspot-1" data-position="-0.08570529649889017m 0.04145468076083492m 0.047821404844763646m" data-normal="0.5519301796625541m 0.4882932784044598m -0.6759754071286066m" data-visibility-attribute="visible">
+            <div class="HotspotAnnotation">AquaSentinel Station - 2</div>
+        </button>
+        <button class="Hotspot" slot="hotspot-2" data-position="0.07863751724350394m 0.038193128779642274m -0.01580335814296932m" data-normal="-0.037255093760591274m 0.002431168802391541m -0.9993028306810423m" data-visibility-attribute="visible">
+            <div class="HotspotAnnotation">AquaSentinal Station - 1</div>
         </button>
 
-        <button class="hotspot" slot="hotspot-1" data-position="2m 1.5m 1m" data-normal="0m 1m 0m">
-            <div class="annotation">Station Alpha</div>
-        </button>
-
-        <button class="hotspot" slot="hotspot-2" data-position="-2m 1.5m -1m" data-normal="0m 1m 0m">
-            <div class="annotation">Station Beta</div>
-        </button>
-
-        <div id="ar-prompt">
-            <img src="https://modelviewer.dev/shared-assets/icons/hand.png" alt="AR Prompt">
-        </div>
+        <button slot="ar-button" class="ar-button">🚀 LAUNCH AR</button>
     </model-viewer>
 
-</body>
+    <script>
+        const viewer = document.querySelector('#viewer');
+        const progress = document.querySelector('#progress');
+        const loadingUI = document.querySelector('#loading-ui');
 
+        viewer.addEventListener('progress', (e) => {
+            const percent = Math.round(e.detail.totalProgress * 100);
+            progress.innerText = `Downloading: ${percent}%`;
+            if (percent >= 100) progress.innerText = "Processing Heavy Assets...";
+        });
+
+        viewer.addEventListener('load', () => {
+            loadingUI.style.display = 'none';
+            viewer.dismissPoster();
+        });
+    </script>
+</body>
 </html>
